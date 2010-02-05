@@ -1,0 +1,87 @@
+<html>
+<head>
+    <link type="text/css" href="css/humanity/jquery-ui-1.7.1.custom.css" rel="stylesheet"/>
+    <script type="text/javascript" src="js/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript" src="js/jquery-ui-1.7.1.custom.min.js"></script>
+    <script type='text/javascript'>
+        $(function() {
+            $('#datepicker').datepicker({
+                inline: true, onSelect: function(dateText) {
+                    loadShow();
+                }
+            });
+        });
+
+        function loadShow() {
+            document.getElementById('link').innerHTML = '';
+
+            var date = $('#datepicker').datepicker('getDate');
+            if (date.getDay() == 0 || date.getDay() == 6) {
+                document.getElementById('link').innerHTML = 'Sorry, shows are only available on weekdays';
+            } else {
+                var month = date.getMonth() + 1;
+                if (month < 10) {
+                    month = '0' + month;
+                }
+
+                var day = date.getDate();
+                if (day < 10) {
+                    day = '0' + day;
+                }
+
+                var year = date.getFullYear();
+
+				var url = 'http://www.daveramsey.com/radio/get-recap/dtepublishdate/' + year + '%2D' + month + '%2D' + day + '/intcatid/230/';
+
+                document.title = 'The Dave Ramsey Show - ' + month + '-' + day + '-' + year;
+
+				var link = 'http://a1611.g.akamai.net/f/1611/25495/9h/dramsey.download.akamai.com/23572/audio/mp3/tdrs_archive/' + month + '' + day + '' + year + '_the_dave_ramsey_show_archive.mp3';
+                document.getElementById('link').innerHTML = '<a href=' + link + '>' + link + '</a>';
+
+				loadRecapFrame(url);
+            }
+        }
+		
+		function loadRecapFrame(url) {
+			document.getElementById('recap').src = url;
+		}
+
+        function loadRecapAjax(url) {
+            document.getElementById('recap').innerHTML = 'loading...';
+            try {
+                if (netscape.security.PrivilegeManager.enablePrivilege) {
+                    netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserRead");
+                }
+                var client = new XMLHttpRequest();
+                client.open("GET", url, true);
+                client.onreadystatechange = function() {
+                    if (client.readyState == 4 && client.status == 200) {
+                        if (client.responseText) {
+                            document.getElementById('recap').innerHTML = client.responseText;
+                        }
+                    }
+                };
+                client.send(null);
+            } catch (e) {
+                document.getElementById('recap').innerHTML = 'Sorry, browser security settings won\'t let this program run. ' + e;
+            }
+        }
+    </script>
+    <style type="text/css">
+        body {
+            font: 60% "Trebuchet MS", sans-serif;
+            margin: 10px;
+        }
+
+        .text {
+            font-size: 14px;
+            font-family: "Helvetica";
+        }
+    </style>
+</head>
+<body>
+<span id="datepicker"></span>
+<p id='link' class="text"></p>
+<iframe id='recap' width='100%' height='100%' frameborder='yes'>loading...</iframe>
+</body>
+</html>
